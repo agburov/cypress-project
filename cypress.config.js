@@ -5,6 +5,9 @@ module.exports = defineConfig({
   projectId: 'opmaco',
   // E2E test settings
   e2e: {
+    // Base URL for the application
+    baseUrl: 'https://guest:welcome2qauto@qauto.forstudy.space',
+    
     // Browser settings
     viewportWidth: 1280,
     viewportHeight: 720,
