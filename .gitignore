@@ -44,6 +44,7 @@ jspm_packages/
 # Cypress screenshots and videos
 cypress/screenshots/
 cypress/videos/
+cypress/downloads/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
