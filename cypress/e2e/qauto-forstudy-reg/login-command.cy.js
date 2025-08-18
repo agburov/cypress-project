@@ -22,18 +22,26 @@ describe('QAuto Login Command Tests', () => {
         cy.contains('.app-wrapper button', 'Sign up').click()
 
         // Wait for registration modal
-        cy.get('.modal-content').should('be.visible')
+        cy.get('.modal-content').as('modal').should('be.visible')
+
+        // Alias registration fields and button
+        cy.get('#signupName').as('signupName')
+        cy.get('#signupLastName').as('signupLastName')
+        cy.get('#signupEmail').as('signupEmail')
+        cy.get('#signupPassword').as('signupPassword')
+        cy.get('#signupRepeatPassword').as('signupRepeatPassword')
+        cy.contains('.modal-footer button', 'Register').as('registerButton')
 
         // Register the user
-        cy.get('#signupName').type('Test')
-        cy.get('#signupLastName').type('User')
-        cy.get('#signupEmail').type(email)
-        cy.get('#signupPassword').type(password, { sensitive: true })
-        cy.get('#signupRepeatPassword').type(password, { sensitive: true })
-        cy.get('.modal-footer button').contains('Register').click()
+        cy.get('@signupName').type('Test')
+        cy.get('@signupLastName').type('User')
+        cy.get('@signupEmail').type(email)
+        cy.get('@signupPassword').type(password, { sensitive: true })
+        cy.get('@signupRepeatPassword').type(password, { sensitive: true })
+        cy.get('@registerButton').click()
 
         // Wait for registration to complete
-        cy.get('.modal-content').should('not.exist')
+        cy.get('@modal').should('not.exist')
 
         // Test the custom login command
         // We need to start fresh to test login properly
@@ -52,7 +60,7 @@ describe('QAuto Login Command Tests', () => {
         cy.get('body').then(($body) => {
             if ($body.find('.app-wrapper button').length > 0) {
                 // If buttons are available, try to find Sign In button
-                cy.get('.app-wrapper button').then(($buttons) => {
+                cy.get('.app-wrapper button').as('headerButtons').then(($buttons) => {
                     let signInButton = null
 
                     $buttons.each((index, button) => {
@@ -68,15 +76,15 @@ describe('QAuto Login Command Tests', () => {
                         cy.wrap(signInButton).click()
 
                         // Wait for login modal
-                        cy.get('.modal-content').should('be.visible')
+                        cy.get('.modal-content').as('loginModal').should('be.visible')
 
                         // Try invalid credentials
-                        cy.get('#signinEmail').type('invalid@example.com')
-                        cy.get('#signinPassword').type('wrongpassword', { sensitive: true })
-                        cy.get('.modal-footer button').contains('Login').click()
+                        cy.get('#signinEmail').as('signinEmail').type('invalid@example.com')
+                        cy.get('#signinPassword').as('signinPassword').type('wrongpassword', { sensitive: true })
+                        cy.contains('.modal-footer button', 'Login').as('loginButton').click()
 
                         // Should show error or stay on login form
-                        cy.get('.modal-content').should('be.visible')
+                        cy.get('@loginModal').should('be.visible')
                     } else {
                         // If no Sign In button found, user might already be logged in
                         cy.log('No Sign In button found - user might already be logged in')
