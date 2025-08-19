@@ -5,8 +5,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "cy:clean": "rimraf cypress/screenshots cypress/videos",
+    "cy:clean:all": "rimraf cypress/screenshots cypress/videos cypress/reports/mochawesome && node -e \"require('fs').mkdirSync('cypress/reports/mochawesome',{recursive:true})\"",
     "cy:open": "npx cypress open",
-    "cy:run": "npm run cy:clean && cypress run"
+    "cy:run": "npm run cy:clean && cypress run",
+    "cy:run:qauto1": "npm run cy:clean && cypress run --config-file cypress.config.qauto1.js --spec cypress/e2e/qauto-cli-reporters/garage.cy.js",
+    "cy:run:qauto2": "npm run cy:clean && cypress run --config-file cypress.config.qauto2.js --spec cypress/e2e/qauto-cli-reporters/garage.cy.js",
+    "cy:open:qauto1": "cypress open --config-file cypress.config.qauto1.js",
+    "cy:open:qauto2": "cypress open --config-file cypress.config.qauto2.js",
+    "report:clean": "rimraf cypress/reports/mochawesome/mochawesome.json",
+    "reports:clean:all": "rimraf cypress/reports/mochawesome && node -e \"require('fs').mkdirSync('cypress/reports/mochawesome',{recursive:true})\"",
+    "report:merge": "npm run report:clean && mochawesome-merge \"cypress/reports/mochawesome/mochawesome-report*.json\" -o cypress/reports/mochawesome/mochawesome.json",
+    "report:generate": "marge cypress/reports/mochawesome/mochawesome.json --reportDir cypress/reports/mochawesome --reportFilename index --inline"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +24,9 @@
     "cypress": "^14.5.4"
   },
   "devDependencies": {
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.3.0",
+    "mochawesome-report-generator": "^6.2.0",
     "rimraf": "^6.0.1"
   }
 }
