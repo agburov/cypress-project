@@ -1,4 +1,3 @@
-// Custom login command for QAuto application (legacy behavior kept for other tasks)
 // Custom login command for QAuto application
 Cypress.Commands.add('login', (email, password) => {
     cy.visit('https://guest:welcome2qauto@qauto.forstudy.space/')
