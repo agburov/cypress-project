@@ -53,6 +53,34 @@ Cypress.Commands.add('login', (email, password) => {
     })
 })
 
+// Dedicated login for qauto CLI reporters task (isolated, does not affect legacy tests)
+Cypress.Commands.add('qautoLogin', (email, password) => {
+    const userEmail = email || Cypress.env('userEmail')
+    const userPassword = password || Cypress.env('userPassword')
+
+    cy.visit('/')
+    cy.get('body').should('be.visible')
+
+    cy.get('body').then(($body) => {
+        const signInElement = $body
+            .find('a, button')
+            .toArray()
+            .find((el) => /sign\s*in|signin|login/i.test(el.textContent?.trim() || ''))
+
+        if (signInElement) {
+            cy.wrap(signInElement).click()
+            cy.get('.modal-content, [role="dialog"]').should('be.visible')
+            cy.get('#signinEmail, input[name="email"]').first().type(userEmail)
+            cy.get('#signinPassword, input[name="password"]').first().type(userPassword, { sensitive: true })
+            cy.contains('.modal-footer button, .modal-content button, [role="dialog"] button, button', /login/i).click({ force: true })
+            cy.get('body').should('not.contain.text', 'Sign In')
+        } else {
+            cy.log('Sign In control not found - assuming already logged in')
+            cy.get('body').should('be.visible')
+        }
+    })
+})
+
 // Override type command to hide passwords in logs
 Cypress.Commands.overwrite('type', (originalFn, element, text, options) => {
     // If sensitive: false is explicitly specified, show password in logs

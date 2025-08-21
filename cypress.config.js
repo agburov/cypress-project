@@ -3,11 +3,22 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
   // Project main settings
   projectId: 'opmaco',
+  // Reporter settings
+  reporter: 'mochawesome',
+  reporterOptions: {
+    reportDir: 'cypress/reports/mochawesome',
+    reportFilename: 'mochawesome-report',
+    overwrite: false,
+    html: true,
+    json: true,
+    embeddedScreenshots: true,
+    inlineAssets: true
+  },
   // E2E test settings
   e2e: {
     // Base URL for the application
     baseUrl: 'https://guest:welcome2qauto@qauto.forstudy.space',
-    
+
     // Browser settings
     viewportWidth: 1280,
     viewportHeight: 720,
