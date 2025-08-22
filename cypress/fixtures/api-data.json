@@ -1,0 +1,16 @@
+{
+    "car": {
+        "brand": "BMW",
+        "model": "X5",
+        "mileage": 15000
+    },
+    "expense": {
+        "liters": 50,
+        "totalCost": 3000,
+        "mileage": 15200
+    },
+    "apiEndpoints": {
+        "cars": "https://qauto.forstudy.space/api/cars",
+        "expenses": "https://qauto.forstudy.space/api/expenses"
+    }
+}
