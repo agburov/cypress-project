@@ -10,7 +10,7 @@ on:
       browser:
         description: 'Browser to run (chrome, firefox, electron)'
         required: false
-        default: 'electron'
+        default: ''
 
 jobs:
   cypress:
@@ -44,7 +44,14 @@ jobs:
             --ipc=host \
             --entrypoint /bin/bash \
             cypress/included:15.2.0 \
-            -lc 'npm ci && cypress verify && if [ -n "${BROWSER}" ]; then BROWSER_ARG="--browser \"${BROWSER}\""; else BROWSER_ARG=""; fi; set -o pipefail; cypress run --spec "${SPEC}" ${BROWSER_ARG} 2>&1 | grep -v -E "Failed to connect to the bus|Automatic fallback to software WebGL has been deprecated|on.cypress.io/cloud-get-started"; exit ${PIPESTATUS[0]}'
+            -lc 'npm ci >/dev/null 2>&1 \
+            && cypress verify >/dev/null 2>&1 \
+            && if [ -z "${SPEC}" ]; then SPEC="cypress/e2e/qauto-forstudy-reg/registration.cy.js"; fi \
+            && if [ -n "${BROWSER}" ]; then BROWSER_ARG="--browser ${BROWSER}"; else BROWSER_ARG=""; fi \
+            && set -o pipefail \
+            && cypress run -q --spec "${SPEC}" ${BROWSER_ARG} 2>&1 \
+              | grep -v -E "Failed to connect to the bus|Automatic fallback to software WebGL has been deprecated|on.cypress.io/cloud-get-started"; \
+            exit ${PIPESTATUS[0]}'
 
       - name: Upload videos
         if: always()
