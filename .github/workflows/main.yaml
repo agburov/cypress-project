@@ -7,12 +7,17 @@ on:
         description: 'Spec/glob to run'
         required: false
         default: 'cypress/e2e/qauto-forstudy-reg/registration.cy.js'
+      browser:
+        description: 'Browser to run (chrome, firefox, electron)'
+        required: false
+        default: 'electron'
 
 jobs:
   cypress:
     runs-on: ubuntu-latest
     env:
       SPEC: ${{ github.event.inputs.spec || 'cypress/e2e/qauto-forstudy-reg/registration.cy.js' }}
+      BROWSER: ${{ github.event.inputs.browser }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5.0.0
@@ -35,8 +40,9 @@ jobs:
             -v "$HOME/.npm":/root/.npm \
             -w /e2e \
             --ipc=host \
+            --entrypoint /bin/sh \
             cypress/included:15.2.0 \
-            /bin/sh -lc "npm ci && cypress verify && cypress run --spec '\"${SPEC}\"'"
+            -lc 'npm ci && cypress verify && if [ -n "${BROWSER}" ]; then BROWSER_ARG="--browser \"${BROWSER}\""; else BROWSER_ARG=""; fi; cypress run --spec "${SPEC}" ${BROWSER_ARG}'
 
       - name: Upload videos
         if: always()
