@@ -16,7 +16,7 @@ jobs:
   cypress:
     runs-on: ubuntu-latest
     env:
-      SPEC: ${{ github.event.inputs.spec || 'cypress/e2e/qauto-forstudy-reg/registration.cy.js' }}
+      SPEC: ${{ github.event.inputs.spec }}
       BROWSER: ${{ github.event.inputs.browser }}
     steps:
       - name: Checkout repository
@@ -38,11 +38,13 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}":/e2e \
             -v "$HOME/.npm":/root/.npm \
+            -e SPEC="$SPEC" \
+            -e BROWSER="$BROWSER" \
             -w /e2e \
             --ipc=host \
-            --entrypoint /bin/sh \
+            --entrypoint /bin/bash \
             cypress/included:15.2.0 \
-            -lc 'npm ci && cypress verify && if [ -n "${BROWSER}" ]; then BROWSER_ARG="--browser \"${BROWSER}\""; else BROWSER_ARG=""; fi; cypress run --spec "${SPEC}" ${BROWSER_ARG}'
+            -lc 'npm ci && cypress verify && if [ -n "${BROWSER}" ]; then BROWSER_ARG="--browser \"${BROWSER}\""; else BROWSER_ARG=""; fi; set -o pipefail; cypress run --spec "${SPEC}" ${BROWSER_ARG} 2>&1 | grep -v -E "Failed to connect to the bus|Automatic fallback to software WebGL has been deprecated|on.cypress.io/cloud-get-started"; exit ${PIPESTATUS[0]}'
 
       - name: Upload videos
         if: always()
