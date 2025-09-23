@@ -1,0 +1,63 @@
+name: Cypress in Docker
+
+on:
+  workflow_dispatch:
+    inputs:
+      spec:
+        description: 'Spec/glob to run'
+        required: false
+        default: 'cypress/e2e/qauto-forstudy-reg/registration.cy.js'
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+    env:
+      SPEC: ${{ github.event.inputs.spec || 'cypress/e2e/qauto-forstudy-reg/registration.cy.js' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5.0.0
+
+      - name: Cache npm
+        uses: actions/cache@v4.2.4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-
+
+      - name: Pull Cypress Docker image 15.2.0
+        run: docker pull cypress/included:15.2.0
+
+      - name: Run Cypress inside Docker
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}":/e2e \
+            -v "$HOME/.npm":/root/.npm \
+            -w /e2e \
+            --ipc=host \
+            cypress/included:15.2.0 \
+            /bin/sh -lc "npm ci && cypress verify && cypress run --spec '\"${SPEC}\"'"
+
+      - name: Upload videos
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: cypress-videos
+          path: cypress/videos/**
+          if-no-files-found: ignore
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots/**
+          if-no-files-found: ignore
+
+      - name: Upload reports (if any)
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: cypress-reports
+          path: cypress/reports/**
+          if-no-files-found: ignore
